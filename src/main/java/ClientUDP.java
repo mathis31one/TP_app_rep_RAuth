@@ -16,33 +16,55 @@ public class ClientUDP {
         InetAddress ia = InetAddress.getByName("localhost");
         int port = 28414;
         // saisir login + mot de passe
-        Scanner sc = new Scanner(System.in);
-        System.out.print("Login : ");
-        String login = sc.nextLine();
-        System.out.print("Mot de passe : ");
-        String motDePasse = sc.nextLine();
-        // construction de la requÃªte (chaÃ®ne de caractÃ¨res)
-        String req = login + " " + motDePasse;
-        System.out.println(req);
-
-        // construction du DatagramPacket pour envoyer la requÃªte
-        byte[] data = req.getBytes();
+        String request = "CHK Toto Toto";
+        byte[] data = request.getBytes();
         DatagramPacket dp_out = new DatagramPacket(data, data.length, ia, port);
-
-        // émission de la requête
         ds.send(dp_out);
 
-        // tampon pour recevoir les rÃ©ponses
+        // Receive the CHK response
         byte[] tampon = new byte[1024];
-
-        // construction du DatagramPacket pour recevoir la rÃ©ponse
         DatagramPacket dp_in = new DatagramPacket(tampon, tampon.length);
+        ds.receive(dp_in);
+        String response = new String(dp_in.getData(), 0, dp_in.getLength());
+        System.out.println("CHK response: " + response);
 
-        // attente de la rÃ©ponse
-        String reponse = new String(dp_in.getData(), 0, dp_in.getLength());
-        System.out.println("Réponse : " + reponse);
+        // Send a DEL command
+        request = "DEL Toto Toto";
+        data = request.getBytes();
+        dp_out = new DatagramPacket(data, data.length, ia, port);
+        ds.send(dp_out);
 
-        // affiche la rÃ©ponse
+        // Receive the DEL response
+        dp_in = new DatagramPacket(tampon, tampon.length);
+        ds.receive(dp_in);
+        response = new String(dp_in.getData(), 0, dp_in.getLength());
+        System.out.println("DEL response: " + response);
+
+        // Send an ADD command
+        request = "ADD Toto Toto";
+        data = request.getBytes();
+        dp_out = new DatagramPacket(data, data.length, ia, port);
+        ds.send(dp_out);
+
+        // Receive the ADD response
+        dp_in = new DatagramPacket(tampon, tampon.length);
+        ds.receive(dp_in);
+        response = new String(dp_in.getData(), 0, dp_in.getLength());
+        System.out.println("ADD response: " + response);
+
+        // Send a MOD command
+        request = "MOD Toto Toto";
+        data = request.getBytes();
+        dp_out = new DatagramPacket(data, data.length, ia, port);
+        ds.send(dp_out);
+
+        // Receive the MOD response
+        dp_in = new DatagramPacket(tampon, tampon.length);
+        ds.receive(dp_in);
+        response = new String(dp_in.getData(), 0, dp_in.getLength());
+        System.out.println("MOD response: " + response);
+
+        // Close the socket
         ds.close();
     }
 }

@@ -13,7 +13,7 @@ public class AuthServerUDP {
         listeAuth = la;
     }
 
-    public void traiterRequetes() {
+    public void traiterRequetes() throws RuntimeException {
 
         // creation DatagramSocket
         try {
@@ -32,18 +32,31 @@ public class AuthServerUDP {
                 String req = new String(dp_in.getData(), 0, dp_in.getLength());
                 // traite la requête : découpage, vérification type...
                 String[] tokens = req.split(" ");
+                String login = tokens[1];
+                String passwd = tokens[2];
+                String reponse = "";
 
-                if (tokens.length != 2) {
-                    throw new IOException("Format de requête incorrect");
+                if (req.startsWith("CHK")) {
+                    boolean isAuthentified = listeAuth.tester(login, passwd);
+                    reponse = isAuthentified ? "AUTH OK" : "AUTH KO";
+                } else if (req.startsWith("DEL")) {
+                    boolean isDeleted = listeAuth.supprimer(login, passwd);
+                    reponse = isDeleted ? "GOOD" : "BAD";
+                } else if (req.startsWith("MOD")) {
+                    boolean todate = listeAuth.mettreAJour(login, passwd);
+                    reponse = todate ? "GOOD" : "BAD";
+                } else if (req.startsWith("ADD")) {
+                    boolean isAdded = listeAuth.creer(login, passwd);
+                    reponse = isAdded ? "GOOD" : "BAD";
+                } else {
+                    reponse = "Commande invalide";
                 }
-                // traitement ListeAuth avec appel méthode tester()
-                boolean estAuthentifie = listeAuth.tester(tokens[0], tokens[1]);
-                // construction DatagramPacket pour réponse
-                String reponse = estAuthentifie ? "AUTH OK" : "AUTH KO";
+
+                JsonLogger.log("localhost",ds.getPort(),"UDP","?",login,reponse);
                 byte[] data = reponse.getBytes();
                 DatagramPacket dp_out = new DatagramPacket(data, data.length, dp_in.getAddress(), dp_in.getPort());
-                // renvoie la réponse au client
                 ds.send(dp_out);
+
             } catch (IOException e) {
                 // gestion d'erreur
                 e.printStackTrace();
