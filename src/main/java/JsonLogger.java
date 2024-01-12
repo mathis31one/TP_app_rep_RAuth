@@ -1,5 +1,6 @@
 package main.java;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 import javax.json.Json;
@@ -13,14 +14,13 @@ import javax.json.JsonObjectBuilder;
  *
  */
 public class JsonLogger {
-	
+
+
+
 	// Attributs à compléter
-	
-	/**
-	 * Constructeur à compléter
-	 */
+	private static ArrayList jsons = new ArrayList<JsonObject>();
 	private JsonLogger() {
-		
+
 	}
 	
 	/**
@@ -76,6 +76,12 @@ public class JsonLogger {
 	 */
 	public static void log(String host, int port, String proto, String type, String login, String result) {
 		JsonLogger logger = getLogger();
-		// à compléter
+		JsonObject obj = logger.reqToJson(host,port,proto,type,login,result);
+		jsons.add(obj);
+
+	}
+
+	public static ArrayList getJsons() {
+		return jsons;
 	}
 }
